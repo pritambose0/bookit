@@ -1,10 +1,11 @@
 "use client";
 
-import Button from "@/components/Button";
+import { Suspense } from "react";
 import { CheckCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Button from "@/components/Button";
 
-export default function BookingConfirmedPage() {
+function BookingConfirmedInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const refId = searchParams.get("ref") || "HUF56&SO";
@@ -22,11 +23,20 @@ export default function BookingConfirmedPage() {
       </p>
 
       <Button
+        type="button"
         onClick={() => router.push("/")}
         className="mt-6 px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
       >
         Back to Home
       </Button>
     </div>
+  );
+}
+
+export default function BookingConfirmedPage() {
+  return (
+    <Suspense fallback={<div className="text-center mt-20">Loading...</div>}>
+      <BookingConfirmedInner />
+    </Suspense>
   );
 }
