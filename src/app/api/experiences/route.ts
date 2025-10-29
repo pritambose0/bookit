@@ -7,9 +7,18 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, description, price, image, slots, currency } = body;
+    const { title, description, price, image, slots, currency, location } =
+      body;
 
-    if (!title || !description || !price || !image || !slots || !currency) {
+    if (
+      !title ||
+      !description ||
+      !price ||
+      !image ||
+      !slots ||
+      !currency ||
+      !location
+    ) {
       return Response.json(
         { success: false, message: "All fields are required" },
         { status: 400 }
@@ -25,9 +34,9 @@ export async function POST(req: NextRequest) {
 
     const existingExperience = await ExperienceModel.findOne({
       title,
-      description,
       price,
       currency,
+      location,
     });
 
     if (existingExperience) {
@@ -44,6 +53,7 @@ export async function POST(req: NextRequest) {
       image: image.trim(),
       slots,
       currency,
+      location: location.trim(),
     });
 
     await experience.save();

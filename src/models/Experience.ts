@@ -14,6 +14,7 @@ export interface Experience extends Document {
   price: number;
   currency: string;
   image: string;
+  location: string;
   slots: Slot[];
 }
 
@@ -43,6 +44,11 @@ const ExperienceSchema = new Schema<Experience>(
     image: {
       type: String,
       required: [true, "Image URL is required"],
+    },
+    location: {
+      type: String,
+      required: [true, "Location is required"],
+      trim: true,
     },
     slots: {
       type: [
