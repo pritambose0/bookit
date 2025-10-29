@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import axios from "axios";
+import { NewBookingData } from "@/app/checkout/page";
 
 interface Slot {
   _id: string;
@@ -25,18 +26,6 @@ interface Experience {
   image: string;
   price: number;
   slots: Slot[];
-}
-
-export interface BookingData {
-  experienceId: string;
-  title: string;
-  location: string;
-  date: string;
-  time: string;
-  quantity: number;
-  subTotal: number;
-  tax: number;
-  total: number;
 }
 
 export default function ExperienceDetails() {
@@ -111,7 +100,7 @@ export default function ExperienceDetails() {
   const total = basePrice * quantity + tax;
 
   const handleConfirmData = () => {
-    const bookingData: BookingData = {
+    const bookingData: NewBookingData = {
       experienceId: id,
       title: experienceData.title,
       location: experienceData.location,
