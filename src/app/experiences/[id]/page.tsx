@@ -43,6 +43,10 @@ export default function ExperienceDetails() {
   const [error, setError] = useState<string>();
 
   useEffect(() => {
+    router.prefetch("/checkout");
+  }, [router]);
+
+  useEffect(() => {
     if (!id) return;
     setLoading(true);
 

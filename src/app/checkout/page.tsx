@@ -117,8 +117,8 @@ export default function CheckoutPage() {
     try {
       const res = await axios.post("/api/bookings", bookingData);
       if (res.data.success) {
-        toast.success("Booking submitted successfully!");
         router.push(`/booking-confirmed?ref=${res.data?.data?._id}`);
+        toast.success("Booking submitted successfully!");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
