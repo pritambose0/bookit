@@ -10,6 +10,7 @@ export interface Booking extends Document {
   email: string;
   promocode?: Schema.Types.ObjectId;
   experience: Schema.Types.ObjectId;
+  quantity: number;
   price: number;
   finalPrice: number;
   slot: SlotSelection;
@@ -38,6 +39,10 @@ const BookingSchema = new Schema<Booking>(
       type: Schema.Types.ObjectId,
       ref: "Experience",
       required: [true, "Experience ID is required"],
+    },
+    quantity: {
+      type: Number,
+      default: 1,
     },
     price: {
       type: Number,

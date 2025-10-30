@@ -7,8 +7,16 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, description, price, image, slots, currency, location } =
-      body;
+    const {
+      title,
+      description,
+      price,
+      image,
+      slots,
+      currency,
+      location,
+      about,
+    } = body;
 
     if (
       !title ||
@@ -53,6 +61,7 @@ export async function POST(req: NextRequest) {
       image: image.trim(),
       slots,
       currency,
+      about: about.trim(),
       location: location.trim(),
     });
 
@@ -79,16 +88,41 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   await connectDB();
 
   try {
-    const experiences = await ExperienceModel.find();
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const query = searchParams.get("query") || "";
+    const limit = 8;
+    const skip = (page - 1) * limit;
 
-    return Response.json({ success: true, data: experiences }, { status: 200 });
+    // Search by query
+    const filter = query ? { title: { $regex: query, $options: "i" } } : {};
+    const total = await ExperienceModel.countDocuments(filter);
+
+    const experiences = await ExperienceModel.find(filter)
+      .sort({ createdAt: -1, _id: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    return Response.json(
+      {
+        success: true,
+        data: experiences,
+        pagination: {
+          total,
+          currentPage: page,
+          totalPages: Math.ceil(total / limit),
+          hasNextPage: page < Math.ceil(total / limit),
+          hasPrevPage: page > 1,
+        },
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error fetching experiences:", error);
-
     return Response.json(
       { success: false, message: "Failed to fetch experiences" },
       { status: 500 }

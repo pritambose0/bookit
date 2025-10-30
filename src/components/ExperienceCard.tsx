@@ -14,7 +14,7 @@ export default function ExperienceCard({
   description,
 }: Experience) {
   return (
-    <div className="bg-[#F9F9F9] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 h-full w-[300px]">
+    <div className="bg-[#F9F9F9] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 h-full w-full sm:w-[300px]">
       <Image
         src={image || Placeholder}
         width={280}

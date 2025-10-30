@@ -2,16 +2,21 @@ import connectDB from "@/lib/connectDB";
 import BookingModel from "@/models/Booking";
 import ExperienceModel from "@/models/Experience";
 import PromoCodeModel from "@/models/PromoCode";
-import { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 
 export async function POST(req: Request) {
   await connectDB();
 
+  // Start transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const { name, email, experienceId, promocodeId, slot } = await req.json();
+    const { name, email, experienceId, promocodeId, slot, quantity } =
+      await req.json();
 
     // Validate input
-    if (!name || !email || !experienceId || !slot) {
+    if (!name || !email || !experienceId || !slot || !quantity) {
       return Response.json(
         { success: false, message: "All fields are required" },
         { status: 400 }
@@ -39,7 +44,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const experience = await ExperienceModel.findById(experienceId);
+    const experience = await ExperienceModel.findById(experienceId).session(
+      session
+    );
+
     if (!experience) {
       return Response.json(
         { success: false, message: "Experience not found" },
@@ -49,7 +57,9 @@ export async function POST(req: Request) {
 
     // Check if slot is available
     const targetSlot = experience.slots.find(
-      (s) => s.date === slot.date && s.time === slot.time
+      (s) =>
+        new Date(s.date).toISOString() === new Date(slot.date).toISOString() &&
+        s.time === slot.time
     );
 
     if (!targetSlot) {
@@ -59,15 +69,27 @@ export async function POST(req: Request) {
       );
     }
 
-    if (targetSlot.bookedCount >= targetSlot.capacity) {
+    // Check if enough slots are available
+    const remainingSeats = targetSlot.capacity - targetSlot.bookedCount;
+    if (remainingSeats <= 0) {
       return Response.json(
         { success: false, message: "This slot is fully booked" },
         { status: 409 }
       );
     }
 
+    if (quantity > remainingSeats) {
+      return Response.json(
+        {
+          success: false,
+          message: `Only ${remainingSeats} seat(s) left for this slot.`,
+        },
+        { status: 409 }
+      );
+    }
+
     // Calculate final price and apply promocode
-    let finalPrice = experience.price;
+    let finalPrice = experience.price * quantity;
     if (promocodeId) {
       const promo = await PromoCodeModel.findById(promocodeId);
 
@@ -81,11 +103,14 @@ export async function POST(req: Request) {
         if (finalPrice < 0) finalPrice = 0;
       }
     }
+    // Round to 2 decimal places
+    finalPrice = Math.round(finalPrice * 100) / 100;
 
     const booking = new BookingModel({
       name: name.trim(),
-      email: email.trim(),
+      email: email.toLowerCase().trim(),
       experience: experienceId,
+      quantity,
       price: experience?.price,
       slot,
       promocode: promocodeId,
@@ -93,16 +118,19 @@ export async function POST(req: Request) {
       status: "confirmed",
     });
 
-    await booking.save();
+    await booking.save({ session });
 
     // Update slot availability
-    targetSlot.bookedCount += 1;
+    targetSlot.bookedCount += quantity;
 
     if (targetSlot.bookedCount >= targetSlot.capacity) {
       targetSlot.available = false;
     }
 
-    await experience.save({ validateModifiedOnly: true });
+    await experience.save({ session, validateModifiedOnly: true });
+
+    // Commit transaction
+    await session.commitTransaction();
 
     return Response.json(
       {
@@ -114,7 +142,7 @@ export async function POST(req: Request) {
     );
   } catch (err) {
     console.error("Error creating booking:", err);
-
+    await session.abortTransaction();
     return Response.json(
       {
         success: false,
@@ -122,6 +150,8 @@ export async function POST(req: Request) {
       },
       { status: 500 }
     );
+  } finally {
+    await session.endSession();
   }
 }
 

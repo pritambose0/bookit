@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import axios from "axios";
@@ -25,6 +25,8 @@ interface Experience {
   location: string;
   image: string;
   price: number;
+  currency: string;
+  about?: string;
   slots: Slot[];
 }
 
@@ -36,10 +38,9 @@ export default function ExperienceDetails() {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [experienceData, setExperienceData] = useState<Experience | null>(null);
+  const [experienceData, setExperienceData] = useState<Experience>();
   const [loading, setLoading] = useState(true);
-
-  const tax = 59;
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     if (!id) return;
@@ -69,8 +70,12 @@ export default function ExperienceDetails() {
         }
 
         setExperienceData(data);
-      } catch {
-        setExperienceData(null);
+      } catch (error) {
+        console.error("Error fetching experience details:", error);
+
+        if (axios.isAxiosError(error)) {
+          setError(error.response?.data?.message || "Something went wrong.");
+        }
       } finally {
         setLoading(false);
       }
@@ -79,12 +84,22 @@ export default function ExperienceDetails() {
     fetchExperienceDetails();
   }, [id]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="max-w-7xl mx-auto py-20 text-center text-gray-500">
-        Loading...
+      <div className="max-w-7xl mx-auto h-[80vh] text-gray-500 flex justify-center items-center gap-2">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span>Loading...</span>
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto h-[80vh] text-gray-500 flex justify-center items-center gap-2">
+        <p className="text-red-600 font-medium px-4 py-2 rounded-md">{error}</p>
+      </div>
+    );
+  }
 
   if (!experienceData)
     return (
@@ -96,14 +111,19 @@ export default function ExperienceDetails() {
   const slots = experienceData.slots || [];
   const uniqueDates = Array.from(new Set(slots.map((s) => s.date)));
   const timesForSelectedDate = slots.filter((s) => s.date === selectedDate);
+
   const basePrice = experienceData.price || 0;
-  const total = basePrice * quantity + tax;
+  const subtotal = basePrice * quantity;
+  const taxRate = 0.18; // 18%
+  const tax = subtotal * taxRate;
+  const total = subtotal + tax;
 
   const handleConfirmData = () => {
     const bookingData: NewBookingData = {
       experienceId: id,
       title: experienceData.title,
       location: experienceData.location,
+      about: experienceData.about,
       date: selectedDate,
       time: selectedTime,
       subTotal: basePrice,
@@ -123,7 +143,7 @@ export default function ExperienceDetails() {
       <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-0">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-gray-700 hover:text-black mb-4 transition"
+          className="flex items-center gap-1 text-gray-700 hover:text-[#191919] mb-4 transition cursor-pointer"
         >
           <ArrowLeft size={18} />
           <span className="text-sm font-medium">Details</span>
@@ -150,7 +170,7 @@ export default function ExperienceDetails() {
           </p>
 
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
               Choose date
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -181,7 +201,7 @@ export default function ExperienceDetails() {
           </div>
 
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-[#161616] mb-2">
+            <h3 className="text-lg font-medium text-[#161616] mb-2">
               Choose time
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -232,10 +252,9 @@ export default function ExperienceDetails() {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-gray-900 mb-2">About</h3>
-            <p className="text-gray-500 text-sm bg-gray-100 rounded-md px-4 py-2">
-              Scenic routes, trained guides, and safety briefing. Minimum age
-              10.
+            <h3 className="text-lg font-medium text-[#161616] mb-2">About</h3>
+            <p className="text-gray-500 text-sm bg-[#EEEEEE] rounded-md px-2 py-2">
+              {experienceData.about}
             </p>
           </div>
         </section>

@@ -11,6 +11,7 @@ export interface Slot {
 export interface Experience extends Document {
   title: string;
   description: string;
+  about?: string;
   price: number;
   currency: string;
   image: string;
@@ -29,6 +30,11 @@ const ExperienceSchema = new Schema<Experience>(
       type: String,
       required: [true, "Description is required"],
       trim: true,
+    },
+    about: {
+      type: String,
+      trim: true,
+      default: "",
     },
     price: {
       type: Number,
