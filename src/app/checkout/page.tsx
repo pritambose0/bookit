@@ -4,41 +4,10 @@ import { useEffect, useState, startTransition } from "react";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import axios from "axios";
-import { SlotSelection } from "@/models/Booking";
 import { useRouter } from "next/navigation";
 import { CheckCircleIcon, XCircleIcon, Loader2, ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
-
-export interface PromoCode {
-  _id: string;
-  code: string;
-  type: "percent" | "fixed";
-  value: number;
-  validTill: Date;
-}
-
-export interface CartItem {
-  _id?: string;
-  name: string;
-  email: string;
-  quantity: number;
-  promocodeId?: string;
-  experienceId: string;
-  slot?: SlotSelection;
-}
-
-export interface NewBookingData {
-  experienceId: string;
-  title: string;
-  location: string;
-  about?: string;
-  date: string;
-  time: string;
-  quantity: number;
-  subTotal: number;
-  tax: number;
-  total: number;
-}
+import { CartItem, NewBookingData, PromoCode } from "@/types/Booking";
 
 export default function CheckoutPage() {
   const [fullName, setFullName] = useState("");

@@ -6,29 +6,8 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import axios from "axios";
-import { NewBookingData } from "@/app/checkout/page";
-
-interface Slot {
-  _id: string;
-  date: string;
-  time: string;
-  bookedCount: number;
-  capacity: number;
-  seatsLeft: number;
-  available: boolean;
-}
-
-interface Experience {
-  _id: string;
-  title: string;
-  description: string;
-  location: string;
-  image: string;
-  price: number;
-  currency: string;
-  about?: string;
-  slots: Slot[];
-}
+import { Experience } from "@/types/Experience";
+import { NewBookingData } from "@/types/Booking";
 
 export default function ExperienceDetails() {
   const router = useRouter();
