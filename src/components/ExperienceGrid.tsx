@@ -92,26 +92,26 @@ export default function ExperienceGrid({ query }: { query: string }) {
         <button
           onClick={() => setPage((p) => p - 1)}
           disabled={!pagination.hasPrevPage}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+          className={`px-4 py-2 rounded-md text-sm font-medium transition bg-gray-100 ${
             pagination.hasPrevPage
-              ? "bg-gray-100 hover:bg-gray-200 text-gray-800 cursor-pointer"
-              : "bg-gray-50 text-gray-400 cursor-not-allowed"
+              ? "hover:bg-gray-200 text-gray-800 cursor-pointer"
+              : "text-gray-400 cursor-not-allowed"
           }`}
         >
           Previous
         </button>
 
-        <span className="text-gray-600">
+        <span className="text-gray-600 text-sm">
           Page {page} of {pagination.totalPages}
         </span>
 
         <button
           onClick={() => setPage((p) => p + 1)}
           disabled={!pagination.hasNextPage}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+          className={`px-4 py-2 rounded-md text-sm font-medium transition bg-gray-100 ${
             pagination.hasNextPage
-              ? "bg-gray-100 hover:bg-gray-200 text-gray-800 cursor-pointer"
-              : "bg-gray-50 text-gray-400 cursor-not-allowed"
+              ? "hover:bg-gray-200 text-gray-800 cursor-pointer"
+              : "text-gray-400 cursor-not-allowed"
           }`}
         >
           Next

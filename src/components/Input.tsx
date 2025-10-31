@@ -37,7 +37,7 @@ const Input: React.FC<InputProps> = ({
         <button
           type="button"
           onClick={onClear}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition cursor-pointer"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 transition cursor-pointer"
         >
           <X size={16} strokeWidth={2} />
         </button>

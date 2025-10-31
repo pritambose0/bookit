@@ -104,7 +104,7 @@ export default function CheckoutPage() {
 
   if (!experience)
     return (
-      <div className="flex items-center justify-center h-screen text-gray-600">
+      <div className="flex items-center justify-center h-[80vh] text-gray-600">
         <p>No booking data found. Please select an experience first.</p>
       </div>
     );

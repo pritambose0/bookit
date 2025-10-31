@@ -13,7 +13,7 @@ export default function Page() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F9F9F9]">
+    <main className="bg-[#F9F9F9]">
       <Header text={text} setText={setText} onSearch={handleSearch} />
       <ExperienceGrid query={query} />
     </main>

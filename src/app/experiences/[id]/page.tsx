@@ -243,7 +243,7 @@ export default function ExperienceDetails() {
         </section>
 
         {/* Sidebar */}
-        <aside className="bg-[#EFEFEF] rounded-xl shadow-md p-6 h-fit">
+        <aside className="bg-[#EFEFEF] md:sticky md:top-28 rounded-xl shadow-md p-6 h-fit">
           <div className="space-y-3 text-sm text-gray-700">
             <div className="flex justify-between">
               <span>Starts at</span>

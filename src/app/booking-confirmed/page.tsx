@@ -11,7 +11,7 @@ function BookingConfirmedInner() {
   const refId = searchParams.get("ref") || "HUF56&SO";
 
   return (
-    <div className="flex flex-col items-center justify-center pt-28">
+    <div className="flex flex-col items-center justify-center pt-32">
       <CheckCircle className="w-16 h-16 text-green-500 mb-6" />
 
       <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
